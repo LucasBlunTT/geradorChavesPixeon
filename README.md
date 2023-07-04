@@ -1,20 +1,29 @@
-# Potfolio Pessoal
+# Refatoração da Página de Geração de Chaves Pixeon
 
-## 📷 Screenshot
-![image](https://github.com/LucasBlunTT/portfolio-nextjs/assets/83377646/080e56af-1e2e-444e-b698-2803d7fd593c)
+## 📷 Screenshot - ANTES
+![image](https://github.com/LucasBlunTT/geradorChavesPixeon/assets/83377646/d85cb573-c96e-47fe-adbf-f54c112756f7)
 
+## 📷 Screenshot - DEPOIS
+![image](https://github.com/LucasBlunTT/geradorChavesPixeon/assets/83377646/423998b4-5406-45fe-9786-9a1f32251052)
 
 ## 📋 Descrição do projeto
-Projeto criado com a intenção de descrever melhor quem é o Lucas, habilidades e seus projetos, pois com uma página pessoal fica melhor de transmitir a identidade visual do programador.
+Este projeto tem como objetivo refatorar a página de geração de chaves da empresa Pixeon, buscando proporcionar uma experiência visual mais limpa e atualizada de acordo com o momento atual da empresa.
+
+## 🎯 Objetivos
+- Atualizar o design da página de geração de chaves da Pixeon.
+- Melhorar a usabilidade e a experiência do usuário.
+- Simplificar o processo de geração de chaves.
+- Aperfeiçoar a aparência visual, seguindo as tendências atuais.
+
+## 🔧 Funcionalidades
+- DATA DE EXPIRAÇÃO (Vem com uma data fixa máxima, para que o usuário não precise somar sempre o ano atual + o ano máximo que se pode gerar)
+- CAMPOS (Nos campos foram criados uma camada extra de validação, no qual não permite nenhum valor vazio)
+- APLICAÇÃO (O SELECT de aplicações foi colocado de maneira que o usuário possa clicar na aplicação, e como são só três, foram deixados expostos diminuindo cliques de escolha)
 
 ## 💻 Tecnologias utilizadas
 - REACT.JS / NEXT.JS
 - CSS3/SASS
-- SWIPER
-- LIB AOS ANIMATE
+- STITCHES
 
 ## 📈 Status do projeto
 ✅ Concluído
-
-## 🚀 Links 
-- Site em produção: [Link](https://www.caslu.dev/ "Link")
