@@ -17,9 +17,6 @@ export function SectionHero() {
   const [cliente, setCliente] = useState('');
   const [dataExpir, setDataExpir] = useState('');
   const [select, setSelect] = React.useState('StandAlone');
-  const [captaStyle, setCaptaStyle] = useState(null);
-  const [docscanStyle, setDocscanStyle] = useState(null);
-  const [pixprintStyle, setPixprintStyle] = useState(null);
 
   useEffect(() => {
     let date = new Date();
@@ -37,13 +34,10 @@ export function SectionHero() {
   function handleClickAplicacao(event) {
     event.preventDefault;
     setAplicacao(event.target.getAttribute('data-aplicacao'));
-    //setCaptaStyle({ opacity: 0.5 });
   }
 
   async function handleEnviarFormulario(event) {
     event.preventDefault();
-
-    if (select === 'enterprise') dados.software_capta_mode = 'enterprise';
 
     const dados = {
       name: nome,
@@ -55,9 +49,12 @@ export function SectionHero() {
       software_capta_mode: select,
     };
 
+    if (aplicacao !== 'Capta') dados.software_capta_mode = 'StandAlone';
+
     console.log(dados);
 
-    axios
+    {
+      /*axios
       .post('/api/seu-endpoint', dados)
       .then((response) => {
         console.log(response.data); // Lida com a resposta da API
@@ -65,9 +62,9 @@ export function SectionHero() {
       .catch((error) => {
         console.error(error); // Lida com erros na requisição
       });
+    */
+    }
   }
-
-  function handleClick() {}
 
   return (
     <SectioHeroStyle aplicacao={aplicacao}>
@@ -133,7 +130,7 @@ export function SectionHero() {
               </select>
             )}
             <ul>
-              <li style={captaStyle}>
+              <li>
                 <Image
                   src={ImageCapta}
                   alt="capta"
