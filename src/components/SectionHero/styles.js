@@ -60,6 +60,7 @@ export const SectioHeroStyle = styled('section', {
             alignItems: 'center',
             justifyContent: 'center',
             transition: 'transform 5s ease-in-out',
+            opacity: '0.5',
 
             '& :hover': {
               transform: 'translateY(-1rem)',
@@ -96,6 +97,32 @@ export const SectioHeroStyle = styled('section', {
 
         '&:hover': {
           opacity: '0.8',
+        },
+      },
+    },
+  },
+
+  variants: {
+    aplicacao: {
+      Capta: {
+        li: {
+          '&:nth-child(1)': {
+            opacity: '1 !important',
+          },
+        },
+      },
+      PixPrint: {
+        li: {
+          '&:nth-child(2)': {
+            opacity: '1 !important',
+          },
+        },
+      },
+      Docscan: {
+        li: {
+          '&:nth-child(3)': {
+            opacity: '1 !important',
+          },
         },
       },
     },

@@ -67,12 +67,10 @@ export function SectionHero() {
       });
   }
 
-  function handleClick() {
-    
-  }
+  function handleClick() {}
 
   return (
-    <SectioHeroStyle>
+    <SectioHeroStyle aplicacao={aplicacao}>
       <Container>
         <h1>Ativação de Chave de Software Pixeon</h1>
 
