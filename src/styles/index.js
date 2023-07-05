@@ -5,6 +5,7 @@ export const { styled, globalCss, keyframes, getCssText, theme } =
     theme: {
       colors: {
         bluePix: '#1a3a68',
+        footer: '#00B4AC',
         inputFocusColor: '#19f',
         colorLlight: '#adf',
         white: '#ffffff',

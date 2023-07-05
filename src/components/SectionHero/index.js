@@ -16,7 +16,7 @@ export function SectionHero() {
   const [aplicacao, setAplicacao] = useState('');
   const [cliente, setCliente] = useState('');
   const [dataExpir, setDataExpir] = useState('');
-  const [select, setSelect] = React.useState('StandAlone');
+  const [select, setSelect] = useState('StandAlone');
   const [file, setFile] = useState(null);
 
   useEffect(() => {

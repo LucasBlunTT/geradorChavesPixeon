@@ -1,20 +1,19 @@
+import React from 'react';
 import { FooterStyle } from './styles';
 import { Container } from '../../styles/global';
+import Image from 'next/image';
+import LogoPixeonFooter from '../../assets/pixeonFooter.png';
 
 export function Footer() {
   return (
     <FooterStyle>
       <Container>
-        <div>
-          <strong>©2022 CodeBoost</strong>
-          <p>
-            O curso Codeboost foi desenvolvido por William Moreira. As vagas são
-            distribuídas por turmas de forma sazonal. Caso perca alguma
-            oportunidade é só aguardar a próxima turma que normalmente acontece
-            dentro do período de 3 a 4 meses.
-          </p>
+        <Image src={LogoPixeonFooter} alt="image pixeon" />
+        <div className="copyright">
+          <p>PACS Aurora Versão 20.11.0</p>
+          <p>2003 - 2023 © Copyright Pixeon | Todos os direitos reservados</p>
+          <p>Empresa Certificada MPS-SW | ANVISA - 80370219001</p>
         </div>
-       
       </Container>
     </FooterStyle>
   );

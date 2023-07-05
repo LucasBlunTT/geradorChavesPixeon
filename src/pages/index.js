@@ -11,8 +11,8 @@ export default function Home() {
         description="Gerador de licenças da Pixeon"
       />
       <Header />
-      <SectionHero/>
-      {/*<Footer />*/}
+      <SectionHero />
+      <Footer />
     </>
   );
 }
