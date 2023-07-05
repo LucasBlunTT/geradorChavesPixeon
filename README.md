@@ -4,7 +4,8 @@
 ![image](https://github.com/LucasBlunTT/geradorChavesPixeon/assets/83377646/d85cb573-c96e-47fe-adbf-f54c112756f7)
 
 ## 📷 Screenshot - DEPOIS
-![image](https://github.com/LucasBlunTT/geradorChavesPixeon/assets/83377646/423998b4-5406-45fe-9786-9a1f32251052)
+![image](https://github.com/LucasBlunTT/geradorChavesPixeon/assets/83377646/5c9b1697-8c2e-4dd7-9c15-31b1d7751404)
+
 
 ## 📋 Descrição do projeto
 Este projeto tem como objetivo refatorar a página de geração de chaves da empresa Pixeon, buscando proporcionar uma experiência visual mais limpa e atualizada de acordo com o momento atual da empresa.
