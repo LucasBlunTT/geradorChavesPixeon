@@ -124,6 +124,10 @@ export const SectioHeroStyle = styled('section', {
           opacity: '0.8',
         },
       },
+
+      p: {
+        textAlign: 'center',
+      },
     },
   },
 

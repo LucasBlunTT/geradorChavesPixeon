@@ -18,6 +18,7 @@ export function SectionHero() {
   const [dataExpir, setDataExpir] = useState('');
   const [select, setSelect] = useState('StandAlone');
   const [file, setFile] = useState(null);
+  const [erro, setErro] = useState();
 
   useEffect(() => {
     let date = new Date();
@@ -31,6 +32,15 @@ export function SectionHero() {
     }-${diaAtual < 10 ? '0' + diaAtual : diaAtual}`;
     setDataExpir(dataFormatada);
   }, []);
+
+  useEffect(() => {
+    if (erro === true || erro === false) {
+      const timeout = setTimeout(() => {
+        setErro(undefined);
+      }, 5000);
+      return () => clearTimeout(timeout);
+    }
+  }, [erro]);
 
   function handleClickAplicacao(event) {
     event.preventDefault;
@@ -73,9 +83,11 @@ export function SectionHero() {
       .post('http://10.10.1.84:3333/keygen', formData)
       .then((response) => {
         console.log(response.data); // Lida com a resposta da API
+        setErro(false);
       })
       .catch((error) => {
         console.error(error); // Lida com erros na requisição
+        setErro(true);
       });
   }
 
@@ -88,29 +100,29 @@ export function SectionHero() {
           <Input
             required
             id="nome"
-            label="Nome"
+            label="Seu Nome"
             type="text"
             value={nome}
             onChange={(event) => setNome(event.target.value)}
-            placeholder="Nome"
+            placeholder="Seu Nome"
           />
           <Input
             required
             id="estacao"
-            label="Estacao"
+            label="MAC ADDRESS ou NOME ESTACAO"
             type="text"
             value={estacao}
             onChange={(event) => setEstacao(event.target.value)}
-            placeholder="Estacao"
+            placeholder="MAC ADDRESS ou NOME ESTACAO"
           />
           <Input
             id="email"
-            label="Email"
+            label="Seu Email"
             type="email"
             required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="Email"
+            placeholder="Seu Email"
           />
           <Input
             id="cliente"
@@ -183,6 +195,10 @@ export function SectionHero() {
             </ul>
           </div>
           <button>Gerar Licença</button>
+          {erro && <p style={{ color: 'red' }}>Ocorreu um erro ao enviar</p>}
+          {erro === false && (
+            <p style={{ color: 'green' }}>Enviado com sucesso</p>
+          )}
         </form>
       </Container>
     </SectioHeroStyle>
