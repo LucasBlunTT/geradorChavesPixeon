@@ -3,7 +3,7 @@ import { Container } from '../../styles/global';
 
 export const SectioHeroStyle = styled('section', {
   width: '100%',
- marginBottom: '13.3rem',
+  marginBottom: '13.3rem',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',

@@ -2,10 +2,10 @@ import { styled } from '../../styles';
 import { Container } from '../../styles/global';
 
 export const FooterStyle = styled('footer', {
-  padding: '2rem',
-  backgroundColor: '$footer',
   height: '8rem',
   width: '100%',
+  padding: '2rem',
+  backgroundColor: '$footer',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -21,10 +21,10 @@ export const FooterStyle = styled('footer', {
       alignItems: 'flex-start',
       flexDirection: 'column',
 
-      p:{
+      p: {
         color: 'white',
-        fontSize: '1rem',     
-      }
+        fontSize: '1rem',
+      },
     },
   },
 });
