@@ -5,13 +5,8 @@
 ![image](https://github.com/LucasBlunTT/geradorChavesPixeon/assets/83377646/d85cb573-c96e-47fe-adbf-f54c112756f7)
 
 ## 📷 Screenshot - DEPOIS
-<<<<<<< HEAD
 
 ![image](https://github.com/LucasBlunTT/geradorChavesPixeon/assets/83377646/5c9b1697-8c2e-4dd7-9c15-31b1d7751404)
-=======
-![image](https://github.com/LucasBlunTT/geradorChavesPixeon/assets/83377646/5c9b1697-8c2e-4dd7-9c15-31b1d7751404)
-
->>>>>>> 951d1b43956f8d3292fff18a3f44b9c6a2db0872
 
 ## 📋 Descrição do projeto
 
