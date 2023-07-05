@@ -6,7 +6,7 @@
 
 ## 📷 Screenshot - DEPOIS
 
-![image](https://github.com/LucasBlunTT/geradorChavesPixeon/assets/83377646/5c9b1697-8c2e-4dd7-9c15-31b1d7751404)
+![image](https://github.com/LucasBlunTT/geradorChavesPixeon/assets/83377646/20de0e53-671b-49fc-8bda-0948559f4639)
 
 ## 📋 Descrição do projeto
 
