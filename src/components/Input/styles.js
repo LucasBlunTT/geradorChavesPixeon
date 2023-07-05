@@ -22,5 +22,12 @@ export const InputStyle = styled('div', {
       background: 'white',
       boxShadow: '0 0 0 3px $colorLlight)',
     },
+    '&[type="file"]': {
+      display: 'none',
+
+      '&:hover': {
+        background: '$gray300',
+      },
+    },
   },
 });

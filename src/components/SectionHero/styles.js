@@ -23,6 +23,25 @@ export const SectioHeroStyle = styled('section', {
       width: '100%',
       maxWidth: '32rem',
 
+      '.file-label': {
+        marginTop: '2rem',
+        width: '100%',
+        display: 'flex',
+        padding: '1.2rem',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '1rem',
+        alignSelf: 'stretch',
+        borderRadius: '4px',
+        border: '1px solid $gray300',
+        background: '$gray200',
+        transition: '0.2s',
+        cursor: 'pointer',
+        '&:hover': {
+          background: '$gray300',
+        },
+      },
+
       input: {
         '&:not(last-child)': {
           marginBottom: '0.4rem',

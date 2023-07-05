@@ -17,6 +17,7 @@ export function SectionHero() {
   const [cliente, setCliente] = useState('');
   const [dataExpir, setDataExpir] = useState('');
   const [select, setSelect] = React.useState('StandAlone');
+  const [file, setFile] = useState(null);
 
   useEffect(() => {
     let date = new Date();
@@ -36,6 +37,13 @@ export function SectionHero() {
     setAplicacao(event.target.getAttribute('data-aplicacao'));
   }
 
+  function handleFileChange(event) {
+    event.preventDefault();
+
+    const selectedFile = event.target.files[0];
+    setFile(selectedFile);
+  }
+
   async function handleEnviarFormulario(event) {
     event.preventDefault();
 
@@ -46,24 +54,29 @@ export function SectionHero() {
       date: dataExpir,
       email: email,
       software: aplicacao,
-      software_capta_mode: select,
+      software_capta_mode: aplicacao !== 'Capta' ? 'StandAlone' : select,
     };
 
-    if (aplicacao !== 'Capta') dados.software_capta_mode = 'StandAlone';
+    const formData = new FormData();
+    formData.append('name', dados.name);
+    formData.append('client', dados.client);
+    formData.append('station', dados.station);
+    formData.append('date', dados.date);
+    formData.append('email', dados.email);
+    formData.append('software', dados.software);
+    formData.append('software_capta_mode', dados.software_capta_mode);
+    formData.append('file', file);
 
-    console.log(dados);
+    formData.forEach((form) => console.log(form));
 
-    {
-      /*axios
-      .post('/api/seu-endpoint', dados)
+    axios
+      .post('http://10.10.1.84:3333/keygen', formData)
       .then((response) => {
         console.log(response.data); // Lida com a resposta da API
       })
       .catch((error) => {
         console.error(error); // Lida com erros na requisição
       });
-    */
-    }
   }
 
   return (
@@ -118,6 +131,16 @@ export function SectionHero() {
             value={dataExpir}
             onChange={(event) => setDataExpir(event.target.value)}
           />
+          <label htmlFor="file-input" className="file-label">
+            <span>{file ? file.name : 'Escolher Arquivo'}</span>
+            <Input
+              id="file-input"
+              className="file-input"
+              required
+              type="file"
+              onChange={handleFileChange}
+            />
+          </label>
 
           <div className="produtos">
             {aplicacao === 'Capta' && (
