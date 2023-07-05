@@ -75,10 +75,11 @@ export const SectioHeroStyle = styled('section', {
           alignItems: 'center',
           justifyContent: 'center',
           li: {
-            cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            flexDirection: 'column',
+            cursor: 'pointer',
             transition: 'transform 5s ease-in-out',
             opacity: '0.5',
 
@@ -88,6 +89,10 @@ export const SectioHeroStyle = styled('section', {
 
             '&:not(:last-child)': {
               marginRight: '1rem',
+            },
+
+            span: {
+              fontSize: '1.3rem',
             },
 
             img: {

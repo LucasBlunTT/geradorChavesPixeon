@@ -160,6 +160,7 @@ export function SectionHero() {
                   data-aplicacao="Capta"
                   onClick={handleClickAplicacao}
                 />
+                <span>Capta</span>
               </li>
               <li>
                 <Image
@@ -168,6 +169,7 @@ export function SectionHero() {
                   data-aplicacao="PixPrint"
                   onClick={handleClickAplicacao}
                 />
+                <span>Pixprint</span>
               </li>
               <li>
                 <Image
@@ -176,6 +178,7 @@ export function SectionHero() {
                   data-aplicacao="Docscan"
                   onClick={handleClickAplicacao}
                 />
+                <span>Docscan</span>
               </li>
             </ul>
           </div>
