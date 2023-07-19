@@ -47,13 +47,6 @@ export function SectionHero() {
     setAplicacao(event.target.getAttribute('data-aplicacao'));
   }
 
-  function handleFileChange(event) {
-    event.preventDefault();
-
-    const selectedFile = event.target.files[0];
-    setFile(selectedFile);
-  }
-
   async function handleEnviarFormulario(event) {
     event.preventDefault();
 
@@ -150,7 +143,7 @@ export function SectionHero() {
               className="file-input"
               required
               type="file"
-              onChange={handleFileChange}
+              onChange={(event) => setFile(event.target.files[0])}
             />
           </label>
 
