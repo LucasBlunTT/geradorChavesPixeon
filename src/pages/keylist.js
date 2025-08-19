@@ -32,6 +32,15 @@ function dateToTs(str) {
   return Number.isNaN(t) ? 0 : t;
 }
 
+// chave não expirada = expiração >= hoje 00:00
+function isNotExpired(expStr) {
+  const expTs = dateToTs(expStr);
+  if (!expTs) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return expTs >= today.getTime();
+}
+
 export async function getServerSideProps() {
   try {
     const { data: html } = await axios.get(`${BASE_URL}/keylist`, {
@@ -56,7 +65,9 @@ export async function getServerSideProps() {
       const tds = $(tr).find('td');
       if (tds.length === 7 && i > 0) {
         const href = $(tds[6]).find('a').attr('href') || '';
-        const absoluteHref = href.startsWith('http') ? href : `${BASE_URL}${href}`;
+        const absoluteHref = href.startsWith('http')
+          ? href
+          : `${BASE_URL}${href}`;
         items.push({
           name: $(tds[0]).text().trim(),
           client: $(tds[1]).text().trim(),
@@ -69,10 +80,12 @@ export async function getServerSideProps() {
       }
     });
 
-    // padrão: MAIOR data primeiro (mais recente)
-    items.sort((a, b) => dateToTs(b.expiration) - dateToTs(a.expiration));
+    // 1) filtra apenas não expiradas
+    const activeItems = items.filter((it) => isNotExpired(it.expiration));
+    // 2) ordena por expiração (maior primeiro = mais recente)
+    activeItems.sort((a, b) => dateToTs(b.expiration) - dateToTs(a.expiration));
 
-    return { props: { items } };
+    return { props: { items: activeItems } };
   } catch (err) {
     return { props: { items: [], error: String(err?.message || err) } };
   }
@@ -84,15 +97,18 @@ export default function KeylistPage({ items, error }) {
 
   const filteredSorted = useMemo(() => {
     const query = q.trim().toLowerCase();
-    const base = query
-      ? items.filter((r) =>
-          [r.name, r.client, r.station, r.email, r.application]
-            .filter(Boolean)
-            .some((v) => v.toLowerCase().includes(query)),
-        )
-      : items;
 
-    // ordena por expiração; desc = maior primeiro (mais recente)
+    // reforça o filtro no client (caso navegue sem SSR)
+    const base = (
+      query
+        ? items.filter((r) =>
+            [r.name, r.client, r.station, r.email, r.application]
+              .filter(Boolean)
+              .some((v) => v.toLowerCase().includes(query)),
+          )
+        : items
+    ).filter((r) => isNotExpired(r.expiration));
+
     const sorted = [...base].sort(
       (a, b) => dateToTs(b.expiration) - dateToTs(a.expiration),
     );
@@ -142,14 +158,23 @@ export default function KeylistPage({ items, error }) {
                 <td className="mono">{r.station}</td>
                 <td>{r.expiration}</td>
                 <td>
-                  <span className={`badge ${`app_${(r.application || '').toLowerCase()}`}`}>
+                  <span
+                    className={`badge ${`app_${(
+                      r.application || ''
+                    ).toLowerCase()}`}`}
+                  >
                     {r.application}
                   </span>
                 </td>
                 <td>{r.email}</td>
                 <td>
                   {r.downloadUrl ? (
-                    <a className="link" href={r.downloadUrl} target="_blank" rel="noreferrer">
+                    <a
+                      className="link"
+                      href={r.downloadUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       Download da chave
                     </a>
                   ) : (
@@ -160,7 +185,9 @@ export default function KeylistPage({ items, error }) {
             ))}
             {filteredSorted.length === 0 && (
               <tr>
-                <td colSpan="7" className="empty">Nenhum resultado encontrado.</td>
+                <td colSpan="7" className="empty">
+                  Nenhum resultado encontrado.
+                </td>
               </tr>
             )}
           </tbody>
@@ -168,29 +195,128 @@ export default function KeylistPage({ items, error }) {
       </div>
 
       <style jsx>{`
-        :global(body) { background: #f6f7fb; }
-        .wrap { padding: 24px; max-width: 1200px; margin: 0 auto; }
-        .header { display: flex; gap: 16px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-        .header h1 { font-size: 22px; font-weight: 800; letter-spacing: 0.2px; }
-        .actions { display: flex; gap: 10px; align-items: center; }
-        .header input { width: 360px; max-width: 60%; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 12px; outline: none; background: #fff; }
-        .btn { padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; cursor: pointer; }
-        .btn:hover { background: #f3f4f6; }
-        .card { background: #fff; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); overflow: hidden; }
-        .table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        .table thead th { background: #f9fafb; font-weight: 700; text-align: left; padding: 12px 16px; border-bottom: 1px solid #eef2f7; position: sticky; top: 0; z-index: 1; }
-        .table tbody td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-        .table tbody tr:hover td { background: #fafafa; }
-        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; }
-        .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: #eef2f7; }
-        .app_capta { background: #eef2ff; color: #3730a3; }
-        .app_pixprint { background: #fff7ed; color: #9a3412; }
-        .app_docscan { background: #ecfdf5; color: #065f46; }
-        .empty { text-align: center; padding: 24px; color: #6b7280; }
-        .muted { color: #94a3b8; }
-        .link { text-decoration: none; border: 1px solid #e5e7eb; padding: 6px 10px; border-radius: 10px; display: inline-block; transition: transform .08s ease, background .2s ease; }
-        .link:hover { background: #f3f4f6; transform: translateY(-1px); }
-        .error { color: #b91c1c; margin-bottom: 12px; }
+        :global(body) {
+          background: #f6f7fb;
+        }
+        .wrap {
+          padding: 24px;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        .header {
+          display: flex;
+          gap: 16px;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 16px;
+        }
+        .header h1 {
+          font-size: 22px;
+          font-weight: 800;
+          letter-spacing: 0.2px;
+        }
+        .actions {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+        }
+        .header input {
+          width: 360px;
+          max-width: 60%;
+          padding: 10px 12px;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
+          outline: none;
+          background: #fff;
+        }
+        .btn {
+          padding: 10px 12px;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
+          background: #fff;
+          cursor: pointer;
+        }
+        .btn:hover {
+          background: #f3f4f6;
+        }
+        .card {
+          background: #fff;
+          border-radius: 16px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+          overflow: hidden;
+        }
+        .table {
+          width: 100%;
+          border-collapse: separate;
+          border-spacing: 0;
+        }
+        .table thead th {
+          background: #f9fafb;
+          font-weight: 700;
+          text-align: left;
+          padding: 12px 16px;
+          border-bottom: 1px solid #eef2f7;
+          position: sticky;
+          top: 0;
+          z-index: 1;
+        }
+        .table tbody td {
+          padding: 12px 16px;
+          border-bottom: 1px solid #f1f5f9;
+          vertical-align: middle;
+        }
+        .table tbody tr:hover td {
+          background: #fafafa;
+        }
+        .mono {
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+            'Liberation Mono', 'Courier New', monospace;
+          font-size: 12px;
+        }
+        .badge {
+          display: inline-block;
+          padding: 4px 10px;
+          border-radius: 999px;
+          font-size: 12px;
+          font-weight: 700;
+          background: #eef2f7;
+        }
+        .app_capta {
+          background: #eef2ff;
+          color: #3730a3;
+        }
+        .app_pixprint {
+          background: #fff7ed;
+          color: #9a3412;
+        }
+        .app_docscan {
+          background: #ecfdf5;
+          color: #065f46;
+        }
+        .empty {
+          text-align: center;
+          padding: 24px;
+          color: #6b7280;
+        }
+        .muted {
+          color: #94a3b8;
+        }
+        .link {
+          text-decoration: none;
+          border: 1px solid #e5e7eb;
+          padding: 6px 10px;
+          border-radius: 10px;
+          display: inline-block;
+          transition: transform 0.08s ease, background 0.2s ease;
+        }
+        .link:hover {
+          background: #f3f4f6;
+          transform: translateY(-1px);
+        }
+        .error {
+          color: #b91c1c;
+          margin-bottom: 12px;
+        }
       `}</style>
     </div>
   );
