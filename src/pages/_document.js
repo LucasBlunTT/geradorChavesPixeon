@@ -20,7 +20,12 @@ export default function Document() {
           dangerouslySetInnerHTML={{ __html: getCssText() }}
         ></style>
       </Head>
-      <body>
+      <body
+        style={{
+          width: '100vw',
+          height: '100vh',
+        }}
+      >
         <Main />
         <NextScript />
       </body>

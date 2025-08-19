@@ -3,7 +3,6 @@ import { Container } from '../../styles/global';
 
 export const SectioHeroStyle = styled('section', {
   width: '100%',
-  minHeight: 'calc(100vh - 96px)', // ocupa a altura da tela (considerando header de 96px)
   boxSizing: 'border-box',
   display: 'flex',
   alignItems: 'center',
