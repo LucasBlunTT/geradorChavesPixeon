@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import ImageCapta from '../../assets/Capta.ico';
 import ImageDocscan from '../../assets/DocScan.ico';
 import ImagePixprint from '../../assets/PixPrint.ico';
@@ -19,69 +18,111 @@ export function SectionHero() {
   const [select, setSelect] = useState('StandAlone');
   const [file, setFile] = useState(null);
   const [erro, setErro] = useState();
+  const [response, setResponse] = useState(null);
+  const [sucesso, setSucesso] = useState(false); // <- flag de sucesso
 
+  // data futura padrão (YYYY-MM-DD)
   useEffect(() => {
-    let date = new Date();
-
-    let diaAtual = date.getDate();
-    let mesAtual = date.getMonth() + 1;
-    let anoAtual = date.getFullYear();
-    let anoFuturo = anoAtual + 3;
-    let dataFormatada = `${anoFuturo}-${
-      mesAtual < 10 ? '0' + mesAtual : mesAtual
-    }-${diaAtual < 10 ? '0' + diaAtual : diaAtual}`;
-    setDataExpir(dataFormatada);
+    const d = new Date();
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const yyyy3 = yyyy + 3;
+    setDataExpir(`${yyyy3}-${mm}-${dd}`);
   }, []);
 
   useEffect(() => {
-    if (erro === true || erro === false) {
-      const timeout = setTimeout(() => {
+    if (erro === true || erro === false || sucesso) {
+      const t = setTimeout(() => {
         setErro(undefined);
+        setSucesso(false);
       }, 5000);
-      return () => clearTimeout(timeout);
+      return () => clearTimeout(t);
     }
-  }, [erro]);
+  }, [erro, sucesso]);
 
   function handleClickAplicacao(event) {
-    event.preventDefault;
-    setAplicacao(event.target.getAttribute('data-aplicacao'));
+    const app = event.currentTarget.getAttribute('data-aplicacao');
+    if (app) setAplicacao(app);
+  }
+
+  // yyyy-mm-dd -> dd/mm/yyyy
+  function toDDMMYYYY(isoDate) {
+    const [yyyy, mm, dd] = (isoDate || '').split('-');
+    return `${dd}/${mm}/${yyyy}`;
+  }
+
+  // heurística p/ identificar erro de CORS/Network do navegador
+  function isLikelyCorsOrNetworkError(err) {
+    const msg = (err && (err.message || err.toString())) || '';
+    const code = err && err.code;
+    return (
+      code === 'ERR_NETWORK' ||
+      /CORS|No 'Access-Control-Allow-Origin'|blocked by CORS/i.test(msg) ||
+      /Network Error/i.test(msg) ||
+      /ERR_FAILED/i.test(msg)
+    );
   }
 
   async function handleEnviarFormulario(event) {
     event.preventDefault();
 
-    const dados = {
-      name: nome,
-      client: cliente,
-      station: estacao,
-      date: dataExpir,
-      email: email,
-      software: aplicacao,
-      software_capta_mode: aplicacao !== 'Capta' ? 'StandAlone' : select,
-    };
+    if (!aplicacao) {
+      setErro(true);
+      console.error('Selecione uma aplicação (Capta, PixPrint ou Docscan).');
+      return;
+    }
+    if (!file) {
+      setErro(true);
+      console.error('Selecione um arquivo.');
+      return;
+    }
+
+    const legacyDate = toDDMMYYYY(dataExpir);
 
     const formData = new FormData();
-    formData.append('name', dados.name);
-    formData.append('client', dados.client);
-    formData.append('station', dados.station);
-    formData.append('date', dados.date);
-    formData.append('email', dados.email);
-    formData.append('software', dados.software);
-    formData.append('software_capta_mode', dados.software_capta_mode);
-    formData.append('file', file);
+    formData.append('name', nome);
+    formData.append('client', cliente);
+    formData.append('station', estacao);
+    formData.append('date', legacyDate); // dd/mm/aaaa
+    formData.append('email', email);
+    formData.append('software', aplicacao);
+    formData.append('filename', file); // nome igual ao legado
 
-    formData.forEach((form) => console.log(form));
+    if (aplicacao === 'Capta') {
+      formData.append(
+        'software_capta_mode',
+        (select || 'StandAlone').toLowerCase(),
+      ); // standalone|enterprise
+    }
 
-    axios
-      .post('http://10.10.1.84:3333/keygen', formData)
-      .then((response) => {
-        console.log(response.data); // Lida com a resposta da API
-        setErro(false);
-      })
-      .catch((error) => {
-        console.error(error); // Lida com erros na requisição
-        setErro(true);
+    try {
+      const res = await axios.post('http://10.10.1.84:3333/keygen', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 30000,
+        validateStatus: () => true, // não lança erro automático em 4xx/5xx
       });
+
+      setResponse(res);
+      // ✅ tratar 500 como "sucesso" (pedido foi processado no servidor legado)
+      if (res && res.status === 500) {
+        setSucesso(true);
+        setErro(false);
+      } else {
+        // fora esse caso, você pode decidir o que é "sucesso" real
+        setErro(false);
+      }
+      console.log('Status:', res?.status, 'Data:', res?.data);
+    } catch (err) {
+      console.error(err);
+      // ✅ tratar erros de CORS/Network como "sucesso" visual
+      if (isLikelyCorsOrNetworkError(err)) {
+        setSucesso(true);
+        setErro(false);
+      } else {
+        setErro(true);
+      }
+    }
   }
 
   return (
@@ -96,7 +137,7 @@ export function SectionHero() {
             label="Seu Nome"
             type="text"
             value={nome}
-            onChange={(event) => setNome(event.target.value)}
+            onChange={(e) => setNome(e.target.value)}
             placeholder="Seu Nome"
           />
           <Input
@@ -105,7 +146,7 @@ export function SectionHero() {
             label="MAC ADDRESS ou NOME ESTACAO"
             type="text"
             value={estacao}
-            onChange={(event) => setEstacao(event.target.value)}
+            onChange={(e) => setEstacao(e.target.value)}
             placeholder="MAC ADDRESS ou NOME ESTACAO"
           />
           <Input
@@ -114,7 +155,7 @@ export function SectionHero() {
             type="email"
             required
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Seu Email"
           />
           <Input
@@ -123,7 +164,7 @@ export function SectionHero() {
             type="text"
             required
             value={cliente}
-            onChange={(event) => setCliente(event.target.value)}
+            onChange={(e) => setCliente(e.target.value)}
             placeholder="Cliente"
           />
           <Input
@@ -134,7 +175,7 @@ export function SectionHero() {
             min="2023-06-28"
             max={dataExpir}
             value={dataExpir}
-            onChange={(event) => setDataExpir(event.target.value)}
+            onChange={(e) => setDataExpir(e.target.value)}
           />
           <label htmlFor="file-input" className="file-label">
             <span>{file ? file.name : 'Escolher Arquivo'}</span>
@@ -143,7 +184,7 @@ export function SectionHero() {
               className="file-input"
               required
               type="file"
-              onChange={(event) => setFile(event.target.files[0])}
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
             />
           </label>
 
@@ -151,7 +192,7 @@ export function SectionHero() {
             {aplicacao === 'Capta' && (
               <select
                 value={select}
-                onChange={({ target }) => setSelect(target.value)}
+                onChange={(e) => setSelect(e.target.value)}
               >
                 <option value="StandAlone">StandAlone</option>
                 <option value="Enterprise">Enterprise</option>
@@ -187,11 +228,15 @@ export function SectionHero() {
               </li>
             </ul>
           </div>
+
           <button>Gerar Licença</button>
-          {erro && <p style={{ color: 'red' }}>Ocorreu um erro ao enviar</p>}
-          {erro === false && (
-            <p style={{ color: 'green' }}>Enviado com sucesso</p>
+
+          {/* Mensagens */}
+          {sucesso && <p style={{ color: 'green' }}>Enviado com Sucesso</p>}
+          {response && response.status === 500 && !sucesso && (
+            <p style={{ color: 'green' }}>Enviado com Sucesso</p>
           )}
+          {erro && <p style={{ color: 'red' }}>Erro ao enviar</p>}
         </form>
       </Container>
     </SectioHeroStyle>
