@@ -29,7 +29,7 @@ export const globalStyles = globalCss({
     cursor: 'pointer',
     border: 'none',
   },
-  
+
   label: {
     marginBottom: '0.25rem',
   },
@@ -44,4 +44,11 @@ export const Container = styled('div', {
   maxWidth: 1248,
   margin: '0 auto',
   padding: '0 16px',
+
+  '@sm': {
+    padding: '0 12px',
+  },
+  '@xs': {
+    padding: '0 10px',
+  },
 });

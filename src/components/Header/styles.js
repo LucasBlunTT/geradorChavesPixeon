@@ -8,10 +8,16 @@ export const HeaderStyle = styled('header', {
   alignItems: 'center',
   justifyContent: 'center',
 
+  '@md': { height: 84 },
+  '@sm': { height: 72 },
+  '@xs': { height: 64 },
+
   [`${Container}`]: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     height: '100%',
+    paddingTop: 0,
+    paddingBottom: 0,
   },
 });
