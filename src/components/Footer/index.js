@@ -9,8 +9,7 @@ export function Footer() {
     <FooterStyle>
       <Container>
         <Image src={LogoPixeonFooter} alt="image pixeon" />
-        <div className="copyright">
-          <p>PACS Aurora Versão 20.11.0</p>
+        <div className="copyright">          
           <p>2003 - 2023 © Copyright Pixeon | Todos os direitos reservados</p>
           <p>Empresa Certificada MPS-SW | ANVISA - 80370219001</p>
         </div>
