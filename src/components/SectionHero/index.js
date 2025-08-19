@@ -7,6 +7,7 @@ import { Container } from '../../styles/global';
 import { Input } from '../Input';
 import Image from 'next/image';
 import axios from 'axios';
+import Link from 'next/link';
 
 export function SectionHero() {
   const [nome, setNome] = useState('');
@@ -230,6 +231,38 @@ export function SectionHero() {
           </div>
 
           <button>Gerar Licença</button>
+          <Link
+            href="/keylist"
+            target="_blank"
+            rel="noreferrer"
+            style={{ width: '100%' }}
+          >
+            <button
+              type="button" // <-- impede submit
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+                width: '100%',
+                maxWidth: '32rem',
+                padding: '1.2rem',
+                gap: '1rem',
+                alignSelf: 'stretch',
+                borderRadius: '4px',
+                border: '1px solid #d1d5db',
+                background: '#f3f4f6',
+                color: '#111827',
+                cursor: 'pointer',
+                marginTop: '1rem',
+                transition: 'opacity 0.3s',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.opacity = '0.8')}
+              onMouseOut={(e) => (e.currentTarget.style.opacity = '1')}
+            >
+              Listar Licença
+            </button>
+          </Link>
 
           {/* Mensagens */}
           {sucesso && <p style={{ color: 'green' }}>Enviado com Sucesso</p>}

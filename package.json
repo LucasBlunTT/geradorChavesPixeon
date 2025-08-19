@@ -11,7 +11,8 @@
   "dependencies": {
     "@stitches/react": "^1.2.8",
     "aos": "^2.3.4",
-    "axios": "^1.4.0",
+    "axios": "^1.11.0",
+    "cheerio": "1.0.0-rc.12",
     "eslint": "8.28.0",
     "eslint-config-next": "13.0.4",
     "next": "13.0.4",
