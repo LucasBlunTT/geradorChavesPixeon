@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  images: { unoptimized: true }, // se você usa <Image/>
+  trailingSlash: true, // opcional: gera .../index.html
 };
-
 module.exports = nextConfig;

@@ -41,7 +41,7 @@ function isNotExpired(expStr) {
   return expTs >= today.getTime();
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   try {
     const { data: html } = await axios.get(`${BASE_URL}/keylist`, {
       timeout: 30000,
