@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: { unoptimized: true }, // se você usa <Image/>
-  trailingSlash: true, // opcional: gera .../index.html
+  images: { unoptimized: true },
+  trailingSlash: true,
+  async rewrites() {
+    return [
+      { source: '/api/:path*', destination: 'http://10.10.1.84:3333/:path*' },
+    ];
+  },
 };
 module.exports = nextConfig;

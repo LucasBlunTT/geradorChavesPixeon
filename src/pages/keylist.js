@@ -1,9 +1,8 @@
 // pages/keylist.jsx
 import axios from 'axios';
-import cheerio from 'cheerio';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 
-const BASE_URL = 'http://10.10.1.84:3333';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '/api';
 
 // helper: "dd/mm/yyyy" | "yyyy-mm-dd" -> timestamp
 function dateToTs(str) {
@@ -41,64 +40,84 @@ function isNotExpired(expStr) {
   return expTs >= today.getTime();
 }
 
-export async function getStaticProps() {
-  try {
-    const { data: html } = await axios.get(`${BASE_URL}/keylist`, {
-      timeout: 30000,
-      headers: {
-        'User-Agent': 'Mozilla/5.0',
-        Accept: 'text/html,application/xhtml+xml',
-      },
-    });
-
-    const $ = cheerio.load(html);
-
-    let $table = $('table').first();
-    if ($('.CSSTableGenerator table').length) {
-      $table = $('.CSSTableGenerator table').first();
+// converte href do backend para passar pelo proxy /api
+function toProxyHref(href) {
+  if (!href) return '';
+  if (href.startsWith('http')) {
+    try {
+      const u = new URL(href);
+      return `${API_BASE}${u.pathname}${u.search || ''}`;
+    } catch {
+      return href; // fallback
     }
-
-    const items = [];
-    const rows = $table.find('tr');
-
-    rows.each((i, tr) => {
-      const tds = $(tr).find('td');
-      if (tds.length === 7 && i > 0) {
-        const href = $(tds[6]).find('a').attr('href') || '';
-        const absoluteHref = href.startsWith('http')
-          ? href
-          : `${BASE_URL}${href}`;
-        items.push({
-          name: $(tds[0]).text().trim(),
-          client: $(tds[1]).text().trim(),
-          station: $(tds[2]).text().trim(),
-          expiration: $(tds[3]).text().trim(),
-          application: $(tds[4]).text().trim(),
-          email: $(tds[5]).text().trim(),
-          downloadUrl: absoluteHref,
-        });
-      }
-    });
-
-    // 1) filtra apenas não expiradas
-    const activeItems = items.filter((it) => isNotExpired(it.expiration));
-    // 2) ordena por expiração (maior primeiro = mais recente)
-    activeItems.sort((a, b) => dateToTs(b.expiration) - dateToTs(a.expiration));
-
-    return { props: { items: activeItems } };
-  } catch (err) {
-    return { props: { items: [], error: String(err?.message || err) } };
   }
+  return `${API_BASE}${href.startsWith('/') ? href : `/${href}`}`;
 }
 
-export default function KeylistPage({ items, error }) {
+// Parse simples no navegador (sem cheerio)
+function parseHtmlToItems(html) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  let table =
+    doc.querySelector('.CSSTableGenerator table') || doc.querySelector('table');
+  if (!table) return [];
+
+  const rows = Array.from(table.querySelectorAll('tr'));
+  const items = [];
+
+  rows.forEach((tr, i) => {
+    const tds = tr.querySelectorAll('td');
+    if (tds.length === 7 && i > 0) {
+      const a = tds[6].querySelector('a');
+      const href = a?.getAttribute('href') || '';
+      const downloadUrl = toProxyHref(href);
+      items.push({
+        name: tds[0].textContent.trim(),
+        client: tds[1].textContent.trim(),
+        station: tds[2].textContent.trim(),
+        expiration: tds[3].textContent.trim(),
+        application: tds[4].textContent.trim(),
+        email: tds[5].textContent.trim(),
+        downloadUrl,
+      });
+    }
+  });
+
+  return items
+    .filter((it) => isNotExpired(it.expiration))
+    .sort((a, b) => dateToTs(b.expiration) - dateToTs(a.expiration));
+}
+
+export default function KeylistPage() {
+  const [items, setItems] = useState([]);
   const [q, setQ] = useState('');
   const [sortDir, setSortDir] = useState('desc'); // 'desc' = mais recente primeiro
+  const [error, setError] = useState('');
+
+  const load = useCallback(async () => {
+    setError('');
+    try {
+      // same-origin → passa pelo Nginx/rewrites
+      const { data: html } = await axios.get(
+        `${API_BASE}/keylist?_=${Date.now()}`,
+        {
+          responseType: 'text',
+        },
+      );
+      setItems(parseHtmlToItems(html));
+    } catch (e) {
+      setItems([]);
+      setError(String(e?.message || e));
+    }
+  }, []);
+
+  useEffect(() => {
+    // busca sempre que carregar/der refresh
+    load();
+  }, [load]);
 
   const filteredSorted = useMemo(() => {
     const query = q.trim().toLowerCase();
 
-    // reforça o filtro no client (caso navegue sem SSR)
     const base = (
       query
         ? items.filter((r) =>
@@ -131,6 +150,9 @@ export default function KeylistPage({ items, error }) {
             title="Alternar ordem por expiração"
           >
             {sortDir === 'desc' ? 'Mais recente ↓' : 'Mais antiga ↑'}
+          </button>
+          <button className="btn" onClick={load}>
+            Atualizar agora
           </button>
         </div>
       </header>
